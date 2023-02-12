@@ -4,3 +4,5 @@ CLMWishlistsType = {
 }
 CLMNickname = {}
 CLMWishlists = {}
+CLMWishlists["caster"] = {}
+CLMWishlists["melee"] = {}
