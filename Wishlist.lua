@@ -74,7 +74,15 @@ local function saveData()
 	CLM.db.char.nicknameIndex = nicknameIndex
 end
 
+local function clearCheckMarks()
+	for _, value in ipairs(checkmarks) do
+		value:SetTexture(nil)
+	end
+	checkmarks = {}
+end
+
 local function drawCharData()
+	clearCheckMarks()
 	saveData()
 	items = {}
 	wishlistFrame:ReleaseChildren()
@@ -210,6 +218,7 @@ function CLM:createMainFrame()
 	mainFrame:SetCallback(
 			"OnClose",
 			function(widget)
+				clearCheckMarks()
 				wishlistFrame = nil
 				items = {}
 				AceGUI:Release(widget)
