@@ -84,7 +84,7 @@ local function drawCharData()
 	end
 	local wishlist = CLMWishlists[charType][nickname]
 	for wishNumber, table in pairs(wishlist) do
-		wishlistFrame:AddChild(createLabel("Повелитель Горнов Игнис"))
+		wishlistFrame:AddChild(createLabel("Повелитель Горнов Игнис")) --[[fix boss name]]
 		wishlistFrame:AddChild(createItemFrame(table.itemId, 33, table.marker))
 		wishlistFrame:AddChild(createLabel("        " .. wishNumber))
 	end
