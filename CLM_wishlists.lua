@@ -1,8 +1,8 @@
 CLMWishlistsType = {
-	"caster",
-	"melee"
+	"Кастеры",
+	"Милики"
 }
 CLMNickname = {}
 CLMWishlists = {}
-CLMWishlists["caster"] = {}
-CLMWishlists["melee"] = {}
+CLMWishlists["Кастеры"] = {}
+CLMWishlists["Милики"] = {}
