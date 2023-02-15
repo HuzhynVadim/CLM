@@ -21,7 +21,7 @@ local function onGameTooltipSetItem(tooltip)
 		local characterType = spec.characterType
 		local nickname = spec.nickname
 		local wishNumber = spec.wishNumber
-		if ("caster" == characterType) then
+		if ("Кастеры" == characterType) then
 			colorR = 0
 			colorG = 0.58
 			colorB = 0.72

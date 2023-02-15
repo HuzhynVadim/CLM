@@ -11,27 +11,38 @@ local typeDropdown
 local nicknameDropdown
 local checkmarks = {}
 
-local function createItemFrame(itemId, size, checkmark)
+local function createLabel(text)
+	local color = 0.6
+	local f = AceGUI:Create("Label")
+	f:SetText(text)
+	f:SetFont("Fonts\\FRIZQT___CYR.TTF", 12, "")
+	f:SetColor(color, color, color)
+	f:SetWidth(175)
+	f:SetHeight(33)
+	return f
+end
+
+local function createItemFrame(item, size, checkmark)
 	local itemFrame = AceGUI:Create("Icon")
 	itemFrame:SetImageSize(size, size)
-	items[itemId] = Item:CreateFromItemID(itemId)
-	if (items[itemId]:GetItemID()) then
-		items[itemId]:ContinueOnItemLoad(
+	if (item:GetItemID()) then
+		item:ContinueOnItemLoad(
 				function()
-					local itemLink = items[itemId]:GetItemLink()
-					itemFrame:SetImage(items[itemId]:GetItemIcon())
+					local itemLink = item:GetItemLink()
+					itemFrame:SetImage(item:GetItemIcon())
 					if checkmark == true then
 						local checkMark = itemFrame.frame:CreateTexture(nil, "OVERLAY")
 						checkMark:SetWidth(25)
 						checkMark:SetHeight(25)
 						checkMark:SetPoint("CENTER", 6, -8)
-						checkMark:SetTexture("Interface\\AddOns\\CLM\\\checkmark-16.tga")
+						checkMark:SetTexture("Interface\\AddOns\\CLM\\checkmark.tga")
 						table.insert(checkmarks, checkMark)
 					end
 					itemFrame:SetCallback(
 							"OnClick",
 							function(_)
-								SetItemRef(itemLink, itemLink, "LeftButton")
+								--SetItemRef(itemLink, itemLink, "LeftButton") todo need to update xlsx table
+								print("here")
 							end
 					)
 					itemFrame:SetCallback(
@@ -54,19 +65,11 @@ local function createItemFrame(itemId, size, checkmark)
 	return itemFrame
 end
 
-local function createLabel(text)
-	local color = 0.6
-	local f = AceGUI:Create("Label")
-	f:SetText(text)
-	f:SetFont("Fonts\\FRIZQT___CYR.TTF", 14, "")
-	f:SetColor(color, color, color)
-	return f
-end
-
 local function drawTableHeader()
-	wishlistFrame:AddChild(createLabel("Boss"))
-	wishlistFrame:AddChild(createLabel("Item"))
-	wishlistFrame:AddChild(createLabel("WishNumber"))
+	wishlistFrame:AddChild(createLabel("Босс"))
+	wishlistFrame:AddChild(createLabel(" "))
+	wishlistFrame:AddChild(createLabel("Предмет"))
+	wishlistFrame:AddChild(createLabel("Номер"))
 end
 
 local function saveData()
@@ -90,11 +93,27 @@ local function drawCharData()
 	if not charType or not nickname then
 		return
 	end
+	local tempBossName = " "
 	local wishlist = CLMWishlists[charType][nickname]
-	for wishNumber, table in pairs(wishlist) do
-		wishlistFrame:AddChild(createLabel("Повелитель Горнов Игнис")) --[[fix boss name]]
-		wishlistFrame:AddChild(createItemFrame(table.itemId, 33, table.marker))
-		wishlistFrame:AddChild(createLabel("        " .. wishNumber))
+	for index, table in ipairs(wishlist) do
+		local itemId = table.itemId
+		items[itemId] = Item:CreateFromItemID(itemId)
+		local itemName = items[itemId]:GetItemName()
+		local bossName = table.boss
+		if index == 1 then
+			wishlistFrame:AddChild(createLabel(bossName))
+			tempBossName = bossName
+		else
+			if tempBossName == bossName then
+				wishlistFrame:AddChild(createLabel(" "))
+			else
+				wishlistFrame:AddChild(createLabel(bossName))
+				tempBossName = bossName
+			end
+		end
+		wishlistFrame:AddChild(createItemFrame(items[itemId], 25, table.marker))
+		wishlistFrame:AddChild(createLabel(itemName))
+		wishlistFrame:AddChild(createLabel("        " .. table.wishNumber))
 	end
 end
 
@@ -163,8 +182,8 @@ local function drawDropdowns()
 		nicknameDropdown:SetDisabled(false)
 	end
 	nicknameDropdown:SetValue(nicknameIndex)
-	dropDownGroup:AddChild(createDropDownLabel("Character type"))
-	dropDownGroup:AddChild(createDropDownLabel("Nickname"))
+	dropDownGroup:AddChild(createDropDownLabel("Вишлист"))
+	dropDownGroup:AddChild(createDropDownLabel("Ник"))
 	dropDownGroup:AddChild(typeDropdown)
 	dropDownGroup:AddChild(nicknameDropdown)
 	dropDownGroup:AddChild(createDropDownLabel(" "))
@@ -178,9 +197,11 @@ local function createCharTypeFrame()
 			{
 				columns = {
 					{ width = 195 },
-					{ width = 44 },
+					{ width = 25 },
+					{ width = 175 },
 					{ width = 50 }
-				}
+				},
+				space = 5, align = "CENTER"
 			}
 	)
 	frame:SetFullWidth(true)
@@ -202,7 +223,7 @@ function CLM:reloadData()
 		nicknameDropdown:SetList(nicknameList)
 		nicknameDropdown:SetValue(nicknameIndex)
 		drawCharData()
-		mainFrame:SetStatusText("status text")
+		mainFrame:SetStatusText("Dev discord -> Grigoriy#3059")
 	end
 end
 
@@ -212,9 +233,11 @@ function CLM:createMainFrame()
 		return
 	end
 	mainFrame = AceGUI:Create("Frame")
-	mainFrame:SetWidth(400)
-	mainFrame:SetHeight(750)
-	mainFrame.frame:SetResizeBounds(400, 750, 400, 750)
+	local width = 575
+	local height = 750
+	mainFrame:SetWidth(width)
+	mainFrame:SetHeight(height)
+	mainFrame.frame:SetResizeBounds(width, height, width, height)
 	mainFrame:SetCallback(
 			"OnClose",
 			function(widget)
