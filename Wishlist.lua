@@ -22,7 +22,7 @@ local function createLabel(text)
 	return f
 end
 
-local function createItemFrame(item, size, checkmark)
+local function createItemFrame(item, size, marker)
 	local itemFrame = AceGUI:Create("Icon")
 	itemFrame:SetImageSize(size, size)
 	if (item:GetItemID()) then
@@ -30,7 +30,7 @@ local function createItemFrame(item, size, checkmark)
 			function()
 				local itemLink = item:GetItemLink()
 				itemFrame:SetImage(item:GetItemIcon())
-				if checkmark == true then
+				if marker == true then
 					local checkMark = itemFrame.frame:CreateTexture(nil, "OVERLAY")
 					checkMark:SetWidth(35)
 					checkMark:SetHeight(35)
@@ -41,8 +41,8 @@ local function createItemFrame(item, size, checkmark)
 				itemFrame:SetCallback(
 					"OnClick",
 					function(_)
-						--SetItemRef(itemLink, itemLink, "LeftButton") todo need to update xlsx table
-						print("here")
+						--SetItemRef(itemLink, itemLink, "LeftButton")
+						print("CLM -- DEV NOTE -- !NEED TO IMPLEMENT UPDATE XLSX TABLE!")
 					end
 				)
 				itemFrame:SetCallback(
@@ -98,8 +98,11 @@ local function drawCharData()
 	for index, table in ipairs(wishlist) do
 		local itemId = table.itemId
 		items[itemId] = Item:CreateFromItemID(itemId)
-		local itemName = items[itemId]:GetItemName()
+		local itemName = table.itemName
 		local bossName = table.boss
+		local marker = table.marker
+		local wishNumber = table.wishNumber
+		local size = 25
 		if index == 1 then
 			wishlistFrame:AddChild(createLabel(bossName))
 			tempBossName = bossName
@@ -111,9 +114,9 @@ local function drawCharData()
 				tempBossName = bossName
 			end
 		end
-		wishlistFrame:AddChild(createItemFrame(items[itemId], 25, table.marker))
+		wishlistFrame:AddChild(createItemFrame(items[itemId], size, marker))
 		wishlistFrame:AddChild(createLabel(itemName))
-		wishlistFrame:AddChild(createLabel("        " .. table.wishNumber))
+		wishlistFrame:AddChild(createLabel("        " .. wishNumber))
 	end
 end
 
@@ -178,34 +181,25 @@ local function drawDropdowns()
 		nicknameDropdown:SetDisabled(false)
 	end
 	nicknameDropdown:SetValue(nicknameIndex)
-	dropDownGroup:AddChild(createHeaderLabel("      Вишлист"))
-	dropDownGroup:AddChild(createHeaderLabel("          Ник"))
+	dropDownGroup:AddChild(createHeaderLabel("      " .. "Вишлист"))
+	dropDownGroup:AddChild(createHeaderLabel("          " .. "Ник"))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 
 	dropDownGroup:AddChild(typeDropdown)
 	dropDownGroup:AddChild(nicknameDropdown)
 	dropDownGroup:AddChild(createHeaderLabel(" "))
-	local button = AceGUI:Create("Button")
-	button:SetText("Обновить")
-	button:SetWidth(100)
-	button:SetCallback(
-		"OnClick",
-		function()
-			CLM:reloadData()
-		end
-	)
-	dropDownGroup:AddChild(button)
+	dropDownGroup:AddChild(createHeaderLabel(" "))
 
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 
-	dropDownGroup:AddChild(createHeaderLabel("                  Босс"))
+	dropDownGroup:AddChild(createHeaderLabel("                  " .. "Босс"))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
-	dropDownGroup:AddChild(createHeaderLabel("       Предмет"))
-	dropDownGroup:AddChild(createHeaderLabel("           Приоритет"))
+	dropDownGroup:AddChild(createHeaderLabel("       " .. "Предмет"))
+	dropDownGroup:AddChild(createHeaderLabel("           " .. "Приоритет"))
 
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 end
