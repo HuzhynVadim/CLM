@@ -69,16 +69,8 @@ local function createHeaderLabel(text)
 	local f = AceGUI:Create("Label")
 	f:SetText(text)
 	f:SetFont("Fonts\\FRIZQT___CYR.TTF", 14, "")
-	f:SetColor(1,0.843137255,0)
+	f:SetColor(1, 0.843137255, 0)
 	return f
-end
-
-
-local function drawTableHeader()
-	wishlistFrame:AddChild(createHeaderLabel("Босс"))
-	wishlistFrame:AddChild(createHeaderLabel(" "))
-	wishlistFrame:AddChild(createHeaderLabel("Предмет"))
-	wishlistFrame:AddChild(createHeaderLabel("Номер"))
 end
 
 local function saveData()
@@ -98,7 +90,6 @@ local function drawCharData()
 	saveData()
 	items = {}
 	wishlistFrame:ReleaseChildren()
-	drawTableHeader(wishlistFrame)
 	if not charType or not nickname then
 		return
 	end
@@ -141,15 +132,15 @@ end
 local function drawDropdowns()
 	local dropDownGroup = AceGUI:Create("SimpleGroup")
 	dropDownGroup:SetLayout("Table")
-	dropDownGroup:SetAutoAdjustHeight(false)
-	dropDownGroup:SetWidth(228)
-	dropDownGroup:SetHeight(48)
+	dropDownGroup:SetFullWidth(true)
 	dropDownGroup:SetUserData(
 			"table",
 			{
 				columns = {
 					110,
-					110
+					100,
+					150,
+					200
 				},
 				space = 1,
 				align = "CENTER"
@@ -187,10 +178,32 @@ local function drawDropdowns()
 		nicknameDropdown:SetDisabled(false)
 	end
 	nicknameDropdown:SetValue(nicknameIndex)
-	dropDownGroup:AddChild(createHeaderLabel("Вишлист"))
-	dropDownGroup:AddChild(createHeaderLabel("Ник"))
+	dropDownGroup:AddChild(createHeaderLabel("      Вишлист"))
+	dropDownGroup:AddChild(createHeaderLabel("          Ник"))
+	dropDownGroup:AddChild(createHeaderLabel(" "))
+	dropDownGroup:AddChild(createHeaderLabel(" "))
+
 	dropDownGroup:AddChild(typeDropdown)
 	dropDownGroup:AddChild(nicknameDropdown)
+	dropDownGroup:AddChild(createHeaderLabel(" "))
+	local button = AceGUI:Create("Button")
+	button:SetText("Обновить")
+	button:SetWidth(100)
+	button:SetCallback("OnClick", function()CLM:reloadData()  end)
+	dropDownGroup:AddChild(button)
+
+	dropDownGroup:AddChild(createHeaderLabel(" "))
+	dropDownGroup:AddChild(createHeaderLabel(" "))
+	dropDownGroup:AddChild(createHeaderLabel(" "))
+	dropDownGroup:AddChild(createHeaderLabel(" "))
+
+
+	dropDownGroup:AddChild(createHeaderLabel("                  Босс"))
+	dropDownGroup:AddChild(createHeaderLabel(" "))
+	dropDownGroup:AddChild(createHeaderLabel("       Предмет"))
+	dropDownGroup:AddChild(createHeaderLabel("           Приоритет"))
+
+	dropDownGroup:AddChild(createHeaderLabel(" "))
 end
 
 local function createCharTypeFrame()
@@ -209,10 +222,23 @@ local function createCharTypeFrame()
 			}
 	)
 	frame:SetFullWidth(true)
-	frame:SetHeight(0)
-	frame:SetAutoAdjustHeight(false)
+	frame:SetHeight(590)
 	mainFrame:AddChild(frame)
 	wishlistFrame = frame
+end
+
+function CLM:reloadData()
+	charType = CLMWishlistsType[charTypeIndex]
+	nicknameList = CLMNickname[charType]
+	nickname = CLMNickname[charType][nicknameIndex]
+	if mainFrame then
+		typeDropdown:SetList(CLMWishlistsType)
+		typeDropdown:SetValue(charTypeIndex)
+		nicknameDropdown:SetList(nicknameList)
+		nicknameDropdown:SetValue(nicknameIndex)
+		drawCharData()
+		mainFrame:SetStatusText("Dev discord -> Grigoriy#3059")
+	end
 end
 
 function CLM:createMainFrame()
