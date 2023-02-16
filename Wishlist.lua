@@ -27,39 +27,39 @@ local function createItemFrame(item, size, checkmark)
 	itemFrame:SetImageSize(size, size)
 	if (item:GetItemID()) then
 		item:ContinueOnItemLoad(
-				function()
-					local itemLink = item:GetItemLink()
-					itemFrame:SetImage(item:GetItemIcon())
-					if checkmark == true then
-						local checkMark = itemFrame.frame:CreateTexture(nil, "OVERLAY")
-						checkMark:SetWidth(35)
-						checkMark:SetHeight(35)
-						checkMark:SetPoint("CENTER", 6, -8)
-						checkMark:SetTexture("Interface\\AddOns\\CLM\\checkmark.tga")
-						table.insert(checkmarks, checkMark)
-					end
-					itemFrame:SetCallback(
-							"OnClick",
-							function(_)
-								--SetItemRef(itemLink, itemLink, "LeftButton") todo need to update xlsx table
-								print("here")
-							end
-					)
-					itemFrame:SetCallback(
-							"OnEnter",
-							function(_)
-								GameTooltip:SetOwner(itemFrame.frame)
-								GameTooltip:SetPoint("TOPRIGHT", itemFrame.frame, "TOPRIGHT", 220, -13)
-								GameTooltip:SetHyperlink(itemLink)
-							end
-					)
-					itemFrame:SetCallback(
-							"OnLeave",
-							function(_)
-								GameTooltip:Hide()
-							end
-					)
+			function()
+				local itemLink = item:GetItemLink()
+				itemFrame:SetImage(item:GetItemIcon())
+				if checkmark == true then
+					local checkMark = itemFrame.frame:CreateTexture(nil, "OVERLAY")
+					checkMark:SetWidth(35)
+					checkMark:SetHeight(35)
+					checkMark:SetPoint("CENTER", 6, -8)
+					checkMark:SetTexture("Interface\\AddOns\\CLM\\checkmark.tga")
+					table.insert(checkmarks, checkMark)
 				end
+				itemFrame:SetCallback(
+					"OnClick",
+					function(_)
+						--SetItemRef(itemLink, itemLink, "LeftButton") todo need to update xlsx table
+						print("here")
+					end
+				)
+				itemFrame:SetCallback(
+					"OnEnter",
+					function(_)
+						GameTooltip:SetOwner(itemFrame.frame)
+						GameTooltip:SetPoint("TOPRIGHT", itemFrame.frame, "TOPRIGHT", 220, -13)
+						GameTooltip:SetHyperlink(itemLink)
+					end
+				)
+				itemFrame:SetCallback(
+					"OnLeave",
+					function(_)
+						GameTooltip:Hide()
+					end
+				)
+			end
 		)
 	end
 	return itemFrame
@@ -134,42 +134,42 @@ local function drawDropdowns()
 	dropDownGroup:SetLayout("Table")
 	dropDownGroup:SetFullWidth(true)
 	dropDownGroup:SetUserData(
-			"table",
-			{
-				columns = {
-					110,
-					100,
-					150,
-					200
-				},
-				space = 1,
-				align = "CENTER"
-			}
+		"table",
+		{
+			columns = {
+				110,
+				100,
+				150,
+				200
+			},
+			space = 1,
+			align = "CENTER"
+		}
 	)
 	mainFrame:AddChild(dropDownGroup)
 	typeDropdown = AceGUI:Create("Dropdown")
 	nicknameDropdown = AceGUI:Create("Dropdown")
 	nicknameDropdown:SetDisabled(true)
 	typeDropdown:SetCallback(
-			"OnValueChanged",
-			function(_, _, key)
-				charTypeIndex = key
-				charType = CLMWishlistsType[key]
-				nicknameList = CLMNickname[charType]
-				nicknameDropdown:SetDisabled(false)
-				nicknameDropdown:SetList(nicknameList)
-				nicknameDropdown:SetValue(1)
-				nickname = nicknameList[1]
-				drawCharData()
-			end
+		"OnValueChanged",
+		function(_, _, key)
+			charTypeIndex = key
+			charType = CLMWishlistsType[key]
+			nicknameList = CLMNickname[charType]
+			nicknameDropdown:SetDisabled(false)
+			nicknameDropdown:SetList(nicknameList)
+			nicknameDropdown:SetValue(1)
+			nickname = nicknameList[1]
+			drawCharData()
+		end
 	)
 	nicknameDropdown:SetCallback(
-			"OnValueChanged",
-			function(_, _, key)
-				nicknameIndex = key
-				nickname = CLMNickname[charType][nicknameIndex]
-				drawCharData()
-			end
+		"OnValueChanged",
+		function(_, _, key)
+			nicknameIndex = key
+			nickname = CLMNickname[charType][nicknameIndex]
+			drawCharData()
+		end
 	)
 	typeDropdown:SetList(CLMWishlistsType)
 	typeDropdown:SetValue(charTypeIndex)
@@ -189,14 +189,18 @@ local function drawDropdowns()
 	local button = AceGUI:Create("Button")
 	button:SetText("Обновить")
 	button:SetWidth(100)
-	button:SetCallback("OnClick", function()CLM:reloadData()  end)
+	button:SetCallback(
+		"OnClick",
+		function()
+			CLM:reloadData()
+		end
+	)
 	dropDownGroup:AddChild(button)
 
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
-
 
 	dropDownGroup:AddChild(createHeaderLabel("                  Босс"))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
@@ -210,16 +214,17 @@ local function createCharTypeFrame()
 	local frame = AceGUI:Create("ScrollFrame")
 	frame:SetLayout("Table")
 	frame:SetUserData(
-			"table",
-			{
-				columns = {
-					{ width = 195 },
-					{ width = 25 },
-					{ width = 175 },
-					{ width = 50 }
-				},
-				space = 5, align = "CENTER"
-			}
+		"table",
+		{
+			columns = {
+				{width = 195},
+				{width = 25},
+				{width = 175},
+				{width = 50}
+			},
+			space = 5,
+			align = "CENTER"
+		}
 	)
 	frame:SetFullWidth(true)
 	frame:SetHeight(590)
@@ -253,14 +258,14 @@ function CLM:createMainFrame()
 	mainFrame:SetHeight(height)
 	mainFrame.frame:SetResizeBounds(width, height, width, height)
 	mainFrame:SetCallback(
-			"OnClose",
-			function(widget)
-				clearCheckMarks()
-				wishlistFrame = nil
-				items = {}
-				AceGUI:Release(widget)
-				mainFrame = nil
-			end
+		"OnClose",
+		function(widget)
+			clearCheckMarks()
+			wishlistFrame = nil
+			items = {}
+			AceGUI:Release(widget)
+			mainFrame = nil
+		end
 	)
 	mainFrame:SetLayout("List")
 	mainFrame:SetTitle(CLM.AddonNameAndVersion)
@@ -282,10 +287,10 @@ end
 function CLM:initWishlists()
 	loadData()
 	LibStub("AceConsole-3.0"):RegisterChatCommand(
-			"clm",
-			function()
-				CLM:createMainFrame()
-			end,
-			persist
+		"clm",
+		function()
+			CLM:createMainFrame()
+		end,
+		persist
 	)
 end

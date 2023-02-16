@@ -62,24 +62,28 @@ function CLM:addMapIcon()
 	if CLM.db.char.minimapIcon then
 		iconLoaded = true
 		if LDB then
-			local PCMinimapBtn = LDB:NewDataObject(iconName, {
-				type = "launcher",
-				text = iconName,
-				icon = "interface/icons/classicon_druid.blp",
-				OnClick = function(_, button)
-					if button == "LeftButton" then
-						CLM:createMainFrame()
+			local PCMinimapBtn =
+				LDB:NewDataObject(
+				iconName,
+				{
+					type = "launcher",
+					text = iconName,
+					icon = "interface/icons/classicon_druid.blp",
+					OnClick = function(_, button)
+						if button == "LeftButton" then
+							CLM:createMainFrame()
+						end
+						if button == "RightButton" then
+							CLM:openConfigDialog()
+						end
+					end,
+					OnTooltipShow = function(tt)
+						tt:AddLine(CLM.AddonNameAndVersion)
+						tt:AddLine("|cffffff00Left click|r to open the BiS lists window")
+						tt:AddLine("|cffffff00Right click|r to open addon configuration window")
 					end
-					if button == "RightButton" then
-						CLM:openConfigDialog()
-					end
-				end,
-				OnTooltipShow = function(tt)
-					tt:AddLine(CLM.AddonNameAndVersion)
-					tt:AddLine("|cffffff00Left click|r to open the BiS lists window")
-					tt:AddLine("|cffffff00Right click|r to open addon configuration window")
-				end,
-			})
+				}
+			)
 			if LDBIcon then
 				LDBIcon:Register(iconName, PCMinimapBtn, CLM.db.char)
 			end

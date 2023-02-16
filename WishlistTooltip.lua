@@ -40,7 +40,7 @@ local function onGameTooltipSetItem(tooltip)
 end
 
 function CLM:initBisTooltip()
-	LibExtraTip:AddCallback({ type = "item", callback = onGameTooltipSetItem, allevents = true })
+	LibExtraTip:AddCallback({type = "item", callback = onGameTooltipSetItem, allevents = true})
 	LibExtraTip:RegisterTooltip(GameTooltip)
 	LibExtraTip:RegisterTooltip(ItemRefTooltip)
 end
