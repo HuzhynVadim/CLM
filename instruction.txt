@@ -1,0 +1,18 @@
+1) Get a list of all itemIds from the database;
+    select i.item_id as itemId
+    from items i
+             join item_item_sources iis on i.item_id = iis.item_id
+             join item_sources s on s.id = iis.item_source_id
+             join instances i2 on s.instance_id = i2.id
+    where i2.expansion_id=3
+2) Convert json to lua table;
+    https://jsontostring.com/
+    printTable(t)
+3) Update DCLMData;
+4) /run dumpItemsInfo();
+5) /reload;
+6) Copy DCLM from variables;
+7) Convert lua table to json;
+    json.encode(DCLM)
+    https://jsontostring.com/
+8) Update json in app resources;

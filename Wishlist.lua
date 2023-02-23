@@ -22,46 +22,39 @@ local function createLabel(text)
 	return f
 end
 
-local function createItemFrame(item, size, marker)
+local function createItemFrame(itemIcon, itemLink, size, marker)
 	local itemFrame = AceGUI:Create("Icon")
 	itemFrame:SetImageSize(size, size)
-	if (item:GetItemID()) then
-		item:ContinueOnItemLoad(
-			function()
-				local itemLink = item:GetItemLink()
-				itemFrame:SetImage(item:GetItemIcon())
-				if marker == true then
-					local checkMark = itemFrame.frame:CreateTexture(nil, "OVERLAY")
-					checkMark:SetWidth(35)
-					checkMark:SetHeight(35)
-					checkMark:SetPoint("CENTER", 6, -8)
-					checkMark:SetTexture("Interface\\AddOns\\CLM\\checkmark.tga")
-					table.insert(checkmarks, checkMark)
-				end
-				itemFrame:SetCallback(
-					"OnClick",
-					function(_)
-						--SetItemRef(itemLink, itemLink, "LeftButton")
-						print("CLM -- DEV NOTE -- !NEED TO IMPLEMENT UPDATE XLSX TABLE!")
-					end
-				)
-				itemFrame:SetCallback(
-					"OnEnter",
-					function(_)
-						GameTooltip:SetOwner(itemFrame.frame)
-						GameTooltip:SetPoint("TOPRIGHT", itemFrame.frame, "TOPRIGHT", 220, -13)
-						GameTooltip:SetHyperlink(itemLink)
-					end
-				)
-				itemFrame:SetCallback(
-					"OnLeave",
-					function(_)
-						GameTooltip:Hide()
-					end
-				)
-			end
-		)
+	itemFrame:SetImage(itemIcon)
+	if marker == true then
+		local checkMark = itemFrame.frame:CreateTexture(nil, "OVERLAY")
+		checkMark:SetWidth(35)
+		checkMark:SetHeight(35)
+		checkMark:SetPoint("CENTER", 6, -8)
+		checkMark:SetTexture("Interface\\AddOns\\CLM\\checkmark.tga")
+		table.insert(checkmarks, checkMark)
 	end
+	itemFrame:SetCallback(
+		"OnClick",
+		function(_)
+			--SetItemRef(itemLink, itemLink, "LeftButton")
+			print("CLM -- DEV NOTE -- !NEED TO IMPLEMENT UPDATE XLSX TABLE!")
+		end
+	)
+	itemFrame:SetCallback(
+		"OnEnter",
+		function(_)
+			GameTooltip:SetOwner(itemFrame.frame)
+			GameTooltip:SetPoint("TOPRIGHT", itemFrame.frame, "TOPRIGHT", 220, -13)
+			GameTooltip:SetHyperlink(itemLink)
+		end
+	)
+	itemFrame:SetCallback(
+		"OnLeave",
+		function(_)
+			GameTooltip:Hide()
+		end
+	)
 	return itemFrame
 end
 
@@ -96,9 +89,9 @@ local function drawCharData()
 	local tempBossName = " "
 	local wishlist = CLMWishlists[charType][nickname]
 	for index, table in ipairs(wishlist) do
-		local itemId = table.itemId
-		items[itemId] = Item:CreateFromItemID(itemId)
+		local itemIcon = table.itemIcon
 		local itemName = table.itemName
+		local itemLink = table.itemLink
 		local bossName = table.boss
 		local marker = table.marker
 		local wishNumber = table.wishNumber
@@ -114,7 +107,7 @@ local function drawCharData()
 				tempBossName = bossName
 			end
 		end
-		wishlistFrame:AddChild(createItemFrame(items[itemId], size, marker))
+		wishlistFrame:AddChild(createItemFrame(itemIcon, itemLink, size, marker))
 		wishlistFrame:AddChild(createLabel(itemName))
 		wishlistFrame:AddChild(createLabel("        " .. wishNumber))
 	end
@@ -141,7 +134,7 @@ local function drawDropdowns()
 		{
 			columns = {
 				110,
-				100,
+				120,
 				150,
 				200
 			},
@@ -287,4 +280,28 @@ function CLM:initWishlists()
 		end,
 		persist
 	)
+end
+
+function dumpItemsInfo()
+	local tmpInfo = {}
+	for _, table in ipairs(itemData) do
+		local item = Item:CreateFromItemID(table.itemId)
+		local itemId = item:GetItemID()
+		if (itemId) then
+			item:ContinueOnItemLoad(
+				function()
+					local name = item:GetItemName()
+					local icon = item:GetItemIcon()
+					local link = item:GetItemLink()
+					tmpInfo[itemId] = {
+						["name"] = name,
+						["icon"] = icon,
+						["link"] = link
+					}
+				end
+			)
+		end
+	end
+	DCLM = tmpInfo
+	print("dump complete")
 end

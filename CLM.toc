@@ -2,7 +2,7 @@
 ## Title: CLM |cFFFF0000[Alpha]|r
 ## Version: 0.0.4
 ## Author: Gudim
-## SavedVariables: CLMDB, UCLM
+## SavedVariables: CLMDB, DCLM
 ## X-License: GNU GPL V3
 
 # Libs.
@@ -24,3 +24,4 @@ CLM_wishlists.lua
 CLM_items.lua
 Wishlist.lua
 WishlistTooltip.lua
+DCLMData.lua
