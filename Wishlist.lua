@@ -281,27 +281,3 @@ function CLM:initWishlists()
 		persist
 	)
 end
-
-function dumpItemsInfo()
-	local tmpInfo = {}
-	for _, table in ipairs(itemData) do
-		local item = Item:CreateFromItemID(table.itemId)
-		local itemId = item:GetItemID()
-		if (itemId) then
-			item:ContinueOnItemLoad(
-				function()
-					local name = item:GetItemName()
-					local icon = item:GetItemIcon()
-					local link = item:GetItemLink()
-					tmpInfo[itemId] = {
-						["name"] = name,
-						["icon"] = icon,
-						["link"] = link
-					}
-				end
-			)
-		end
-	end
-	DCLM = tmpInfo
-	print("dump complete")
-end

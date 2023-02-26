@@ -41,7 +41,7 @@ local configTable = {
 
 local function migrateAddonDB()
 	if not CLM.db.char["version"] then
-		CLM.db.char.version = 0.4
+		CLM.db.char.version = 1.0
 		CLM.db.char.charTypeIndex = 1
 		CLM.db.char.nicknameIndex = 1
 	end

@@ -6,7 +6,7 @@ end
 
 function CLM:OnInitialize()
 	CLM.AceAddonName = "ConsulLootMaster"
-	CLM.AddonNameAndVersion = "ConsulLootMaster 0.0.4"
+	CLM.AddonNameAndVersion = "ConsulLootMaster 1.0"
 	if not checkTable(CLMNickname) and not checkTable(CLMWishlists) then
 		CLM:initConfig()
 		CLM:addMapIcon()
