@@ -1,5 +1,5 @@
 ## Interface: 30401
-## Title: CLM |c00FF00[Beta]|r
+## Title: CLM |cFF00FF00[Beta]|r
 ## Version: 1.0
 ## Author: Gudim
 ## SavedVariables: CLMDB
