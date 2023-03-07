@@ -2,7 +2,7 @@
 ## Title: CLM |cFF00FF00[Beta]|r
 ## Version: 1.0
 ## Author: Gudim
-## SavedVariables: CLMDB
+## SavedVariables: CLMDB, CLMUD, CLMID
 ## X-License: GNU GPL V3
 
 # Libs.
@@ -22,5 +22,6 @@ Core.lua
 Config.lua
 CLM_wishlists.lua
 CLM_items.lua
+CLM_itemsData.lua
 Wishlist.lua
 WishlistTooltip.lua

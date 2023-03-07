@@ -1,18 +1,15 @@
 CLM = LibStub("AceAddon-3.0"):NewAddon("CLM")
 
-local function checkTable(table)
-	return rawequal(next(table), nil)
-end
-
 function CLM:OnInitialize()
 	CLM.AceAddonName = "ConsulLootMaster"
+	CLM.Version = 1.0
 	CLM.AddonNameAndVersion = "ConsulLootMaster 1.0"
-	if not checkTable(CLMNickname) and not checkTable(CLMWishlists) then
+	if not CLM:checkTable(CLMNickname) and not CLM:checkTable(CLMWishlists) then
 		CLM:initConfig()
 		CLM:addMapIcon()
 		CLM:initWishlists()
 	end
-	if not checkTable(CLMItems) then
+	if not CLM:checkTable(CLMItems) then
 		CLM:initBisTooltip()
 	end
 end

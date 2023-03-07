@@ -22,28 +22,88 @@ local function createLabel(text)
 	return f
 end
 
-local function createItemFrame(itemIcon, itemLink, size, marker)
+local function addCheckmark(checkMark, itemFrame, texture)
+	checkMark = itemFrame.frame:CreateTexture(nil, "OVERLAY")
+	checkMark:SetWidth(35)
+	checkMark:SetHeight(35)
+	checkMark:SetPoint("CENTER", 6, -8)
+	checkMark:SetTexture(texture)
+	table.insert(checkmarks, checkMark)
+	return checkMark
+end
+
+local function tableLength(T)
+	local count = 0
+	for _ in pairs(T) do
+		count = count + 1
+	end
+	return count
+end
+
+local function getCheckMarkTemp(marker)
+	local checkMarkTemp
+	if marker == true then
+		checkMarkTemp = false
+	else
+		checkMarkTemp = true
+	end
+	return checkMarkTemp
+end
+
+local function createItemFrame(itemIcon, itemLink, size, marker, wishNumber, itemId)
+	local checkMark
 	local itemFrame = AceGUI:Create("Icon")
 	itemFrame:SetImageSize(size, size)
 	itemFrame:SetImage(itemIcon)
+	local checkMarkTexture = "Interface\\AddOns\\CLM\\checkmark.tga"
+	local checkMarkTemp = getCheckMarkTemp(marker)
+	if CLMUD[charType] and CLMUD[charType][nickname] and CLMUD[charType][nickname][wishNumber] then
+		marker = CLMUD[charType][nickname][wishNumber]["marker"]
+		checkMarkTexture = "Interface\\AddOns\\CLM\\checkmarkTemp.tga"
+	end
 	if marker == true then
-		local checkMark = itemFrame.frame:CreateTexture(nil, "OVERLAY")
-		checkMark:SetWidth(35)
-		checkMark:SetHeight(35)
-		checkMark:SetPoint("CENTER", 6, -8)
-		checkMark:SetTexture("Interface\\AddOns\\CLM\\checkmark.tga")
-		table.insert(checkmarks, checkMark)
+		checkMark = addCheckmark(checkMark, itemFrame, checkMarkTexture)
 	end
 	itemFrame:SetCallback(
 		"OnClick",
-		function(_)
-			--SetItemRef(itemLink, itemLink, "LeftButton")
-			print("CLM -- DEV NOTE -- !NEED TO IMPLEMENT UPDATE XLSX TABLE!")
+		function()
+			if checkMarkTemp == true then
+				if marker == true then
+					marker = false
+				else
+					marker = true
+				end
+				if not CLMUD[charType] then
+					CLMUD[charType] = {}
+				end
+				if not CLMUD[charType][nickname] then
+					CLMUD[charType][nickname] = {}
+				end
+				if not CLMUD[charType][nickname][wishNumber] then
+					CLMUD[charType][nickname][wishNumber] = {
+						["itemId"] = itemId,
+						["marker"] = marker
+					}
+				end
+				if marker == true then
+					checkMark = addCheckmark(checkMark, itemFrame, "Interface\\AddOns\\CLM\\checkmarkTemp.tga")
+				else
+					if tableLength(CLMUD[charType][nickname]) == 1 then
+						CLMUD[charType][nickname] = nil
+					else
+						CLMUD[charType][nickname][wishNumber] = nil
+					end
+					checkMark:SetTexture(nil)
+					if tableLength(CLMUD[charType]) == 0 then
+						CLMUD[charType] = nil
+					end
+				end
+			end
 		end
 	)
 	itemFrame:SetCallback(
 		"OnEnter",
-		function(_)
+		function()
 			GameTooltip:SetOwner(itemFrame.frame)
 			GameTooltip:SetPoint("TOPRIGHT", itemFrame.frame, "TOPRIGHT", 220, -13)
 			GameTooltip:SetHyperlink(itemLink)
@@ -51,7 +111,7 @@ local function createItemFrame(itemIcon, itemLink, size, marker)
 	)
 	itemFrame:SetCallback(
 		"OnLeave",
-		function(_)
+		function()
 			GameTooltip:Hide()
 		end
 	)
@@ -89,13 +149,8 @@ local function drawCharData()
 	local tempBossName = " "
 	local wishlist = CLMWishlists[charType][nickname]
 	for index, table in ipairs(wishlist) do
-		local itemIcon = table.itemIcon
-		local itemName = table.itemName
-		local itemLink = table.itemLink
-		local bossName = table.boss
-		local marker = table.marker
+		local bossName = table.bossName
 		local wishNumber = table.wishNumber
-		local size = 25
 		if index == 1 then
 			wishlistFrame:AddChild(createLabel(bossName))
 			tempBossName = bossName
@@ -107,8 +162,8 @@ local function drawCharData()
 				tempBossName = bossName
 			end
 		end
-		wishlistFrame:AddChild(createItemFrame(itemIcon, itemLink, size, marker))
-		wishlistFrame:AddChild(createLabel(itemName))
+		wishlistFrame:AddChild(createItemFrame(table.itemIcon, table.itemLink, 25, table.marker, wishNumber, table.itemId))
+		wishlistFrame:AddChild(createLabel(table.itemName))
 		wishlistFrame:AddChild(createLabel("        " .. wishNumber))
 	end
 end
@@ -116,6 +171,10 @@ end
 local function loadData()
 	charTypeIndex = CLM.db.char.charTypeIndex
 	nicknameIndex = CLM.db.char.nicknameIndex
+	if CLM.db.char.update then
+		DEFAULT_CHAT_FRAME:AddMessage("here")
+		CLM.db.char.update = false
+	end
 	if charTypeIndex then
 		charType = CLMWishlistsType[charTypeIndex]
 	end
@@ -160,7 +219,7 @@ local function drawDropdowns()
 		end
 	)
 	nicknameDropdown:SetCallback(
-		"OnValueChanged",
+		"OnValueChanged", 
 		function(_, _, key)
 			nicknameIndex = key
 			nickname = CLMNickname[charType][nicknameIndex]
@@ -174,6 +233,18 @@ local function drawDropdowns()
 		nicknameDropdown:SetDisabled(false)
 	end
 	nicknameDropdown:SetValue(nicknameIndex)
+
+	local btn = AceGUI:Create("Button")
+	btn:SetWidth(100)
+	btn:SetText("Сохранить")
+	btn:SetCallback(
+		"OnClick",
+		function()
+			CLM.db.char.update = true
+			C_UI.Reload()
+		end
+	)
+
 	dropDownGroup:AddChild(createHeaderLabel("      " .. "Вишлист"))
 	dropDownGroup:AddChild(createHeaderLabel("          " .. "Ник"))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
@@ -182,7 +253,7 @@ local function drawDropdowns()
 	dropDownGroup:AddChild(typeDropdown)
 	dropDownGroup:AddChild(nicknameDropdown)
 	dropDownGroup:AddChild(createHeaderLabel(" "))
-	dropDownGroup:AddChild(createHeaderLabel(" "))
+	dropDownGroup:AddChild(btn)
 
 	dropDownGroup:AddChild(createHeaderLabel(" "))
 	dropDownGroup:AddChild(createHeaderLabel(" "))
@@ -219,20 +290,6 @@ local function createCharTypeFrame()
 	wishlistFrame = frame
 end
 
-function CLM:reloadData()
-	charType = CLMWishlistsType[charTypeIndex]
-	nicknameList = CLMNickname[charType]
-	nickname = CLMNickname[charType][nicknameIndex]
-	if mainFrame then
-		typeDropdown:SetList(CLMWishlistsType)
-		typeDropdown:SetValue(charTypeIndex)
-		nicknameDropdown:SetList(nicknameList)
-		nicknameDropdown:SetValue(nicknameIndex)
-		drawCharData()
-		mainFrame:SetStatusText("Dev discord -> Grigoriy#3059")
-	end
-end
-
 function CLM:createMainFrame()
 	if mainFrame then
 		CLM:closeMainFrame()
@@ -257,6 +314,8 @@ function CLM:createMainFrame()
 	mainFrame:SetLayout("List")
 	mainFrame:SetTitle(CLM.AddonNameAndVersion)
 	mainFrame:SetStatusText("Dev discord -> Grigoriy#3059")
+	_G["clmMainFrame"] = mainFrame.frame
+	table.insert(UISpecialFrames, "clmMainFrame")
 	drawDropdowns()
 	createCharTypeFrame()
 	drawCharData()
@@ -280,4 +339,8 @@ function CLM:initWishlists()
 		end,
 		persist
 	)
+end
+
+function CLM:checkTable(table)
+	return rawequal(next(table), nil)
 end

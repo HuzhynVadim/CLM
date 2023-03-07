@@ -3,6 +3,7 @@ local LDB = LibStub("LibDataBroker-1.1", true)
 local LDBIcon = LDB and LibStub("LibDBIcon-1.0", true)
 local iconLoaded = false
 local iconName = "CLMIcon"
+local configShown = false
 
 local dbDefaults = {
 	char = {
@@ -40,14 +41,20 @@ local configTable = {
 }
 
 local function migrateAddonDB()
-	if not CLM.db.char["version"] then
-		CLM.db.char.version = 1.0
+	if not CLM.db.char["version"] or CLM.db.char["version"] ~= CLM.Version then
+		CLM.db.char.version = CLM.Version
 		CLM.db.char.charTypeIndex = 1
 		CLM.db.char.nicknameIndex = 1
+		CLM.db.char.update = false
+	end
+	if CLMUD == nil then
+		CLMUD = {}
+	end
+	if CLMID == nil then
+		CLMID = {}
 	end
 end
 
-local configShown = false
 function CLM:openConfigDialog()
 	if configShown then
 		InterfaceOptionsFrame_Show()
@@ -91,9 +98,40 @@ function CLM:addMapIcon()
 	end
 end
 
+function CLM:dumpItemsInfo()
+	DEFAULT_CHAT_FRAME:AddMessage("|cffff6600[" .. CLM.AddonNameAndVersion "]|r CLMUD generation started!")
+	local tmpInfo = {}
+	for _, table in ipairs(ItemData) do
+		local item = Item:CreateFromItemID(table.itemId)
+		local itemId = item:GetItemID()
+		if (itemId) then
+			item:ContinueOnItemLoad(
+				function()
+					tmpInfo[tostring(itemId)] = {
+						["name"] = item:GetItemName(),
+						["icon"] = tostring(item:GetItemIcon()),
+						["link"] = item:GetItemLink()
+					}
+				end
+			)
+		end
+	end
+	CLMID = tmpInfo
+	DEFAULT_CHAT_FRAME:AddMessage("|cffff6600[" .. CLM.AddonNameAndVersion "]|r Save dump is complete!")
+end
+
 function CLM:initConfig()
 	CLM.db = LibStub("AceDB-3.0"):New("CLMDB", dbDefaults, true)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(CLM.AceAddonName, configTable)
+	if not CLM:checkTable(ItemData) then
+		LibStub("AceConsole-3.0"):RegisterChatCommand(
+			"clmdump",
+			function()
+				CLM:dumpItemsInfo()
+			end,
+			persist
+		)
+	end
 	AceConfigDialog:AddToBlizOptions(CLM.AceAddonName, CLM.AceAddonName)
 	migrateAddonDB()
 end
