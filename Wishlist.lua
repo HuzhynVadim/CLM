@@ -98,6 +98,7 @@ local function createItemFrame(itemIcon, itemLink, size, marker, wishNumber, ite
 						CLMUD[charType] = nil
 					end
 				end
+				CLM.db.char.update = true
 			end
 		end
 	)
@@ -171,10 +172,6 @@ end
 local function loadData()
 	charTypeIndex = CLM.db.char.charTypeIndex
 	nicknameIndex = CLM.db.char.nicknameIndex
-	if CLM.db.char.update then
-		DEFAULT_CHAT_FRAME:AddMessage("here")
-		CLM.db.char.update = false
-	end
 	if charTypeIndex then
 		charType = CLMWishlistsType[charTypeIndex]
 	end
@@ -219,7 +216,7 @@ local function drawDropdowns()
 		end
 	)
 	nicknameDropdown:SetCallback(
-		"OnValueChanged", 
+		"OnValueChanged",
 		function(_, _, key)
 			nicknameIndex = key
 			nickname = CLMNickname[charType][nicknameIndex]
@@ -240,8 +237,18 @@ local function drawDropdowns()
 	btn:SetCallback(
 		"OnClick",
 		function()
-			CLM.db.char.update = true
-			C_UI.Reload()
+			if CLM.db.char.update == true then
+				C_UI.Reload()
+			else
+				DEFAULT_CHAT_FRAME:AddMessage(
+					"|cffff6600[" .. CLM.AddonNameAndVersion .. "]|r No data to save!",
+					1,
+					1,
+					1,
+					nil,
+					true
+				)
+			end
 		end
 	)
 

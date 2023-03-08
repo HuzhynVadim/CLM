@@ -99,15 +99,21 @@ function CLM:addMapIcon()
 end
 
 function CLM:dumpItemsInfo()
-	DEFAULT_CHAT_FRAME:AddMessage("|cffff6600[" .. CLM.AddonNameAndVersion "]|r CLMUD generation started!")
-	local tmpInfo = {}
+	DEFAULT_CHAT_FRAME:AddMessage(
+		"|cffff6600[" .. CLM.AddonNameAndVersion .. "]|r CLMUD generation started!",
+		1,
+		1,
+		1,
+		nil,
+		true
+	)
 	for _, table in ipairs(ItemData) do
 		local item = Item:CreateFromItemID(table.itemId)
 		local itemId = item:GetItemID()
 		if (itemId) then
 			item:ContinueOnItemLoad(
 				function()
-					tmpInfo[tostring(itemId)] = {
+					CLMID[tostring(itemId)] = {
 						["name"] = item:GetItemName(),
 						["icon"] = tostring(item:GetItemIcon()),
 						["link"] = item:GetItemLink()
@@ -116,13 +122,38 @@ function CLM:dumpItemsInfo()
 			)
 		end
 	end
-	CLMID = tmpInfo
-	DEFAULT_CHAT_FRAME:AddMessage("|cffff6600[" .. CLM.AddonNameAndVersion "]|r Save dump is complete!")
+	DEFAULT_CHAT_FRAME:AddMessage(
+		"|cffff6600[" .. CLM.AddonNameAndVersion .. "]|r Save dump is complete!",
+		1,
+		1,
+		1,
+		nil,
+		true
+	)
 end
 
 function CLM:initConfig()
 	CLM.db = LibStub("AceDB-3.0"):New("CLMDB", dbDefaults, true)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(CLM.AceAddonName, configTable)
+	if CLM.db.char.update then
+		DEFAULT_CHAT_FRAME:AddMessage(
+				"|cffff6600[" .. CLM.AddonNameAndVersion .. "]|r Save CLMID is complete!",
+				1,
+				1,
+				1,
+				nil,
+				true
+		)
+		DEFAULT_CHAT_FRAME:AddMessage(
+				"|cffff6600[" .. CLM.AddonNameAndVersion .. "]|r Don't forget to update the datastore",
+				1,
+				1,
+				1,
+				nil,
+				true
+		)
+		CLM.db.char.update = false
+	end
 	if not CLM:checkTable(ItemData) then
 		LibStub("AceConsole-3.0"):RegisterChatCommand(
 			"clmdump",

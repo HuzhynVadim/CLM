@@ -21,21 +21,30 @@ local function onGameTooltipSetItem(tooltip)
 		local characterType = spec.characterType
 		local nickname = spec.nickname
 		local wishNumber = spec.wishNumber
-		if ("Кастеры" == characterType) then
-			colorR = 0
-			colorG = 0.58
-			colorB = 0.72
-		else
-			colorR = 0.13
-			colorG = 0.545098039
-			colorB = 0.13
+		local neededItem = true
+		if
+			CLMUD[characterType] and CLMUD[characterType][nickname] and CLMUD[characterType][nickname][wishNumber] and
+				CLMUD[characterType][nickname][wishNumber]["itemId"]
+		 then
+			neededItem = false
 		end
-		if not (previousClass == characterType) then
-			LibExtraTip:AddLine(tooltip, characterType, colorR, colorG, colorB, false)
-			previousClass = characterType
+		if neededItem == true then
+			if (CLMWishlistsType[1] == characterType) then
+				colorR = 0
+				colorG = 0.58
+				colorB = 0.72
+			else
+				colorR = 0.13
+				colorG = 0.545098039
+				colorB = 0.13
+			end
+			if not (previousClass == characterType) then
+				LibExtraTip:AddLine(tooltip, characterType, colorR, colorG, colorB, false)
+				previousClass = characterType
+			end
+			local leftText = "   " .. nickname
+			LibExtraTip:AddDoubleLine(tooltip, leftText, wishNumber, colorR, colorG, colorB, colorR, colorG, colorB, false)
 		end
-		local leftText = "   " .. nickname
-		LibExtraTip:AddDoubleLine(tooltip, leftText, wishNumber, colorR, colorG, colorB, colorR, colorG, colorB, false)
 	end
 end
 
